@@ -1,0 +1,12 @@
+{
+  "name": "just",
+  "version": "1.0.0",
+  "description": "my justfile receipes book",
+  "main": ".justfile",
+  "scripts": {
+    "test": "just"
+  },
+  "keywords": ["justfile","receipes"],
+  "author": "Den Hnatiuk",
+  "license": "Beerware"
+}

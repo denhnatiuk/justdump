@@ -1,0 +1,12 @@
+# env
+.env
+.envrc
+!.env.example
+*.pem
+*.key
+*.gpg
+*.pgp
+# temporary
+.temporary
+.temp
+.idea
