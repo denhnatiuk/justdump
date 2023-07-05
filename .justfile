@@ -8,18 +8,36 @@ JUSTFILE_VERSION := "1.0.0"
 IS_PROD := env_var_or_default("PROD", "")
 IS_CI := env_var_or_default("CI", "")
 
+# TIMESTAMP := (#!/usr/bin/env bash  date +"%T")
 
 Project_Name := trim_start_match( trim_start_match( absolute_path(justfile_directory()), parent_directory( justfile_directory() ) ), "/" )
 Project_Type := env_var_or_default("WP", "")
 
-ssh:
-  ssh $NAS_User@$NAS_Server -p $NAS_Port 
+# ssh:
+#   ssh $NAS_User@$NAS_Server -p $NAS_Port 
+
+# date:
+#   echo {{TIMESTAMP}}
 
 @_default: 
   just --list --unsorted
   echo "Credentials:"
   echo "Justfile https://gist.github.com/DenysHnatiuk/a651e786d42c6bff32e5e41a15f53012"
   echo "Gist token is $GITHUB_GIST_TOKEN"
+
+@tar-bz2-project:
+  rm -f ".temporary/{{Project_Name}}.tar.bz2"
+  tar -C {{justfile_directory()}} --exclude=".temporary" --exclude-vcs-ignores -cjvf .temporary/{{Project_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
+
+@untar-bz2-project:
+  if [ ! -d {{Project_Name}} ]; then \
+    mkdir {{Project_Name}} \
+  else \
+    tar -C {{Project_Name}} -cjvf .temporary/{{Project_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
+  fi \
+    && tar -xjvf {{Project_Name}}.tar.bz2 -C ~/projects/{{Project_Name}} \
+    && rm -f ~/projects/{{Project_Name}}.tar.bz2
+
 
 #backup files to NAS
 @backup2nas +FILES:
@@ -31,7 +49,10 @@ ssh:
   rm -f ".temporary/{{Project_Name}}.tar.bz2"
   tar -C {{justfile_directory()}} --exclude=".temporary" --exclude="{{Project_Name}}.tar.bz2" -cjvf .temporary/{{Project_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
   sudo scp -P $NAS_Port .temporary/{{Project_Name}}.tar.bz2 $NAS_User@$NAS_Server:~/projects
-  ssh -p $NAS_Port $NAS_User@$NAS_Server 'cd ~/projects && mkdir {{Project_Name}} && tar -xjvf {{Project_Name}}.tar.bz2 -C ~/projects/{{Project_Name}} && rm -f ~/projects/{{Project_Name}}.tar.bz2'
+  ssh -p $NAS_Port $NAS_User@$NAS_Server 'cd ~/projects \
+    && if [ ! -d "$DIRECTORY" ]; then mkdir {{Project_Name}} fi \
+    && tar -xjvf {{Project_Name}}.tar.bz2 -C ~/projects/{{Project_Name}} \
+    && rm -f ~/projects/{{Project_Name}}.tar.bz2'
 # gpg --encrypt -r denys.hnatiuk@gmail.com 
 # ssh -P $aliNAS_Port $aliNAS_User@$aliNAS_Server 'cat > ~/projects/$Project_Type.tar.gz.gpg'
 
@@ -92,11 +113,29 @@ DOCKER_FILE := "-f " + (
 )
 
 
-#SASS
+## PHP Toolkit
+
+# PHPBrew
+# PHP stdlib : PhpDotEnv, AutoLoader, ObjectBox, 
+# XDebug
+# Composer
+# CodeSniffer
+# Mess Detector
+# CS Fixer
+# PHP Stan
+# Psalm
+# Unit Tests
+# PHP Frameworks : 
+# PHP CMS :
+
+
+# SASS Toolkit
 _create-sassrc:
   touch .sassrc 
   echo '{ "includePaths": [ "node_modules" ] }' | tee -a .sassrc >/dev/null
 
+
+# Wordpress
 _init-wp-theme:
 
 _create-theme-style-css:

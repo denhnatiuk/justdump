@@ -1,4 +1,4 @@
-# env
+# env & secrets
 .env
 .envrc
 !.env.example
@@ -6,7 +6,13 @@
 *.key
 *.gpg
 *.pgp
-# temporary
+# temporary, backup, cache and lock files
 .temporary
 .temp
 .idea
+.#*
+*~
+~*
+*#
+# 
+node_modules
