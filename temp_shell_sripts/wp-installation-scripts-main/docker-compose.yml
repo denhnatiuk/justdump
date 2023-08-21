@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  wordpress:
+    image: wordpress:php7.4-fpm-alpine
+    container_name: $acc_name
+    restart: always
+    environment:
+      LETSENCRYPT_EMAIL: info@qressy.com
+      WORDPRESS_DB_HOST: $dbhost:3306
+      WORDPRESS_DB_USER: $dbuser
+      WORDPRESS_DB_PASSWORD: $dbpassword
+      WORDPRESS_DB_NAME: $dbname
+      VIRTUAL_PROTO: fastcgi
+      VIRTUAL_ROOT: $acc_name
+      VIRTUAL_HOST: $domain
+      LETSENCRYPT_HOST: $domain
+    volumes:
+      - ~/$acc_name:/var/www/html
+      - ~/php-fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
+    networks:
+      - proxy
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      LETSENCRYPT_EMAIL: info@qressy.com
+      PMA_HOST: $dbhost:3306
+      VIRTUAL_HOST: phpmyadmin.$domain
+      LETSENCRYPT_HOST: phpmyadmin.$domain
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
