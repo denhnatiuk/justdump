@@ -1,7 +1,12 @@
 # Wordpress
-_init-wp-theme:
+
+@phpinfo:
+  #!/usr/bin/php
+  <?php phpinfo(); exit; ?>
 
 
+
+#_init-wp-theme:
 _create-theme-style-css:
   touch style.css
   cat << EOF >>```

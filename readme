@@ -1,1 +1,40 @@
 https://cheatography.com/linux-china/cheat-sheets/justfile/
+
+
+threadpassing:
+
+1. Installation stage
+  - Preinstall
+      Reqiurements: 
+  - Install Just runner
+  - Install software with Just
+
+  -- send +1 installations to stats
+
+2. Implement and remove toolkits
+  - PHP Toolkit
+  - JS Toolkit
+
+  - Wordpress Toolkit
+    -- classic Localhost L(W)AMP Stack
+    -- Docker
+    -- Roots\Trellis 
+    -- WebAsm WordPress
+
+  - Test Toolkits
+
+  - CI / CD Toolkits
+
+  - Git Hooks
+
+  - Backups
+    -- Backup to Local 
+    -- Backup to NAS
+    -- Backup to Google Docs
+    -- Backup to Mega 
+    -- Backup to Dropbox
+    ? MS Azure, AWS
+
+3. Uninstall
+  -- log all installed && rev changes
+  -- send +1 uninnstallation stats and report

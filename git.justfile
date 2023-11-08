@@ -1,3 +1,24 @@
+#!/usr/bin/env just --justfile
+
+set shell := ["zsh", "-cu"] 
+set dotenv-load := true
+set positional-arguments := true
+
+JUSTFILE_VERSION := "1.0.0"
+
+PRJ_VERSION := `node -p "require('./package.json').version"`
+
+# Update version using node: npm version <update_type> : major.minor.patch
+_increment_version +type:
+  npm version {{type}}
+
+# Update version using sh 
+@_set_ver +new_ver:
+  echo version: {{PRJ_VERSION}}
+  jq '. |= . + { "version": "{{new_ver}}" }' package.json > package.json.tmp
+  mv package.json.tmp package.json
+  echo Replaces with version {{new_ver}}
+
 # Setup pre-commit as a Git hook
 precommit:
     #!/usr/bin/env bash

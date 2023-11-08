@@ -1,7 +1,7 @@
 # env & secrets
 .env
 .envrc
-!.env.example
+!.envrc.example
 *.pem
 *.key
 *.gpg

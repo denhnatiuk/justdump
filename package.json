@@ -1,9 +1,10 @@
 {
-  "name": "just",
+  "name": "justdump",
   "version": "1.0.0",
-  "description": "my justfile receipes book",
+  "description": "my justfile receipes dump",
   "main": ".justfile",
   "scripts": {
+    "install": "sh install.just.sh",
     "test": "just"
   },
   "keywords": ["justfile","receipes"],

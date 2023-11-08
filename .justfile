@@ -5,13 +5,20 @@ set dotenv-load := true
 set positional-arguments := true
 
 JUSTFILE_VERSION := "1.0.0"
-IS_PROD := env_var_or_default("PROD", "")
-IS_CI := env_var_or_default("CI", "")
 
-# TIMESTAMP := (#!/usr/bin/env bash  date +"%T")
+TIMESTAMP := `date +"%T"`
 
-Project_Name := trim_start_match( trim_start_match( absolute_path(justfile_directory()), parent_directory( justfile_directory() ) ), "/" )
-Project_Type := env_var_or_default("WP", "")
+Project_Folder_Name := trim_start_match( trim_start_match( absolute_path(justfile_directory()), parent_directory( justfile_directory() ) ), "/" )
+
+Project_NPM_Name := `node -p "require('./package.json').name"`
+
+PRJ_NAME := {{Project_NPM_Name}} || {{Project_Folder_Name}}
+
+PRJ_VERSION := `node -p "require('./package.json').version"`
+
+Project_Type := env_var_or_default("", "WP")
+
+
 
 # ssh:
 #   ssh $NAS_User@$NAS_Server -p $NAS_Port 
@@ -24,6 +31,15 @@ Project_Type := env_var_or_default("WP", "")
   echo "Credentials:"
   echo "Justfile https://gist.github.com/DenysHnatiuk/a651e786d42c6bff32e5e41a15f53012"
   echo "Gist token is $GITHUB_GIST_TOKEN"
+
+@forvarding_aliases:
+  alias just.software='just --justfile .software.install.justfile --working-directory .'
+  alias just.wordpress='just --justfile .wordpress.justfile --working-directory .'
+  alias just.docker='just --justfile .docker.justfile --working-directory .'
+  alias just.aws='just --justfile aws.justfile --working-directory .'
+  alias just.git='just --justfile git.justfile --working-directory .'
+  alias just.idea='just --justfile idea.justfile --working-directory .'
+
 
 #tar.bz2 project
 @tar-bz2-project:
@@ -66,6 +82,12 @@ get_gitattributes:
 @init_receipes-as-shell-alias:
   for recipe in `just --justfile ~/.user.justfile --summary`; do
   alias $recipe="just --justfile ~/.user.justfile --working-directory . $recipe"
+  done
+
+#remove receipe aliases
+@remove_receipes-shell-alias:
+  for recipe in `just --justfile ~/.user.justfile --summary`; do
+  unalias $recipe
   done
 
 # npm audit fix
