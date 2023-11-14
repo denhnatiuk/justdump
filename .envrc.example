@@ -1,8 +1,0 @@
-export GITHUB_GIST_TOKEN=YOUR-GITHUB_GIST_TOKEN
-
-#NAS Server
-export NAS_Port="22"
-export NAS_User="user"
-export NAS_Server="server.domain"
-export Project_Type="examples"
-export NAS="user@server.domain:~/projects"

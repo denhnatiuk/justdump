@@ -1,5 +1,8 @@
 # Wordpress
 
+@_default: 
+  just --list --unsorted
+
 @phpinfo:
   #!/usr/bin/php
   <?php phpinfo(); exit; ?>
@@ -27,3 +30,15 @@ _create-theme-style-css:
   
   This theme, like WordPress, is licensed under the GPL. 
   */ ```EOF
+
+# backup database:
+backup_database:
+  mysqldump -u username -p database_name > database_name.sql
+
+# Update WordPress
+update_wordpress:
+  wp core version
+  wp core update
+  wp plugin update --all
+  wp theme update --all
+  wp core version

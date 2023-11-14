@@ -1,27 +1,33 @@
 
 #install 
 
-test-existance *args:
+# Test existance
+test_existance *args:
   type -p $1 > /dev/null || echo "$1 not found"
 
+# Apt Install
 apt_install *args:
   just apt_update
   sudo apt-get install $1
 
+# Update Apt & Brew
 upd:
   just apt_update
   just brew_update
 
+# Update Apt
 apt_update:
   sudo apt update 
   sudo apt upgrade -y 
   sudo apt autoremove
 
+# Update Homebrew
 brew_update:
   brew update 
   brew outdated 
   brew upgrade
 
+# Install WP CLI
 install-wp-cli:
   #!/usr/bin/env shell
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -31,6 +37,7 @@ install-wp-cli:
   wp --info
 # https://raw.githubusercontent.com/wp-cli/wp-cli/v2.8.1/utils/wp-completion.bash
 
+# Install Composer
 install-composer:
   #!/usr/bin/env bash
   if ! [ -x "$(command -v composer)" ]; then 
@@ -45,6 +52,7 @@ install-composer:
     else composer --version
   fi
 
+# Install Dart
 install-dart:
   just apt_install apt-transport-https
   wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/dart.gpg
@@ -53,6 +61,7 @@ install-dart:
   echo 'export PATH="$PATH:/usr/lib/dart/bin"' >> ~/.profile
 
 
+# Install GitHub CLI
 install-gh:
   type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
   curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 
@@ -63,14 +72,12 @@ install-gh:
 
 # arguments: 1.app 2.dependencies 3.repo_url 4.key_url
 ubuntu-install-app *args='':
-  just apt_update
-  sudo apt-get install $2
+  just apt_install $2
 
   wget -qO- $4 | sudo gpg --dearmor -o `/usr/share/keyrings/`$1`.gpg`
   echo `deb [signed-by=/usr/share/keyrings/`$1`.gpg arch=amd64] `$3` stable main' | sudo tee /etc/apt/sources.list.d/dart_stable.list`
 
-  sudo apt-update
-  sudo apt-get install $1
+  just apt_install $1
 
   echo 'export PATH="$PATH:/usr/lib/dart/bin"' >> ~/.profile
 
@@ -103,27 +110,26 @@ install-edge:
 #   fi
 
 install-php-tools:
-  composer require --dev "composer/installers"
-  composer require --dev "wpreadme2markdown/wpreadme2markdown"
-# composer global require "phpunit/phpunit"
-# composer global require "phpunit/dbunit"
-# composer global require "phing/phing"
-# composer global require "phpdocumentor/phpdocumentor"
-# composer global require "phploc/phploc"
-# composer global require "phpmd/phpmd"
-
-# php static analysis tool with rules set
-  composer require --dev "phpstan/phpstan"
-  composer require --dev "phpstan/phpstan-strict-rules"
-  composer require --dev "php-stubs/wp-cli-stubs"
-  composer require --dev "szepeviktor/phpstan-wordpress"
-  composer require --dev "phpstan/extension-installer"
-
-# php code sniffer tool with rules set
-  composer require --dev "squizlabs/php_codesniffer"
-  composer require --dev "phpcompatibility/php-compatibility"
-  composer require --dev "wp-coding-standards/wpcs"
-  composer require --dev "dealerdirect/phpcodesniffer-composer-installer"
+  #!/usr/bin/env zsh
+  tools=( \
+    "composer/installers" \
+    "wpreadme2markdown/wpreadme2markdown" \
+  # php static analysis tool with rules set
+    "phpstan/phpstan" \
+    "phpstan/phpstan-strict-rules" \
+    "php-stubs/wp-cli-stubs" \
+    "szepeviktor/phpstan-wordpress" \
+    "phpstan/extension-installer" \
+  # php code sniffer tool with rules set
+    "squizlabs/php_codesniffer" \
+    "phpcompatibility/php-compatibility" \
+    "wp-coding-standards/wpcs" \
+    "dealerdirect/phpcodesniffer-composer-installer" \
+  )
+  for i in "${tools[@]}"
+  do
+    composer require --dev "$i"
+  done
 
   composer global update
 
