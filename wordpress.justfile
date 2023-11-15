@@ -1,5 +1,9 @@
 # Wordpress
 
+Author := `git config --get user.name`
+
+
+
 @_default: 
   just --list --unsorted
 
@@ -15,17 +19,17 @@ _create-theme-style-css:
   cat << EOF >>```
   @charset "UTF-8";
   /*!
-  Theme Name: geliostrans
-  Theme URI: https://github.com/DenysHnatiuk/cv/
-  Author: Den Hnatiuk  
-  Author URI: https://denyshnatiuk.github.io/geliostrans/ 
+  Theme Name: {{themeName}}
+  Theme URI: https://github.com/{{Author}}/{{themeName}}
+  Author: {{Author}}
+  Author URI: https://denyshnatiuk.github.io/
   Description: Description 
-  Version: 0.0.1 
-  Requires PHP: 5.6 
-  Tested up to: 5.4 
+  Version: {{themeVersion}} 
+  Requires PHP: {{phpVersion}}
+  Tested up to: {{phpTestsVersion}}
   License: GNU General Public License v2 or later 
   License URI: LICENSE 
-  Text Domain: geliostrans 
+  Text Domain: {{themeName}}
   Tags:  
   
   This theme, like WordPress, is licensed under the GPL. 

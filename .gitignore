@@ -1,11 +1,14 @@
 # env & secrets
 .env
+!*.example
+!*.template
 .envrc
 !.envrc.example
 *.pem
 *.key
 *.gpg
 *.pgp
+*.secret
 # temporary, backup, cache and lock files
 .temporary
 .temp

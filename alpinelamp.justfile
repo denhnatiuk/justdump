@@ -83,10 +83,13 @@ fi
 
 @software_install:
   apt update && apt upgrade -y
-  apt install mariadb mariadb-client \
+  apt install 
+    mariadb \ 
+    mariadb-client \
     apache2 \
     apache2-utils \
-    curl wget \
+    curl \
+    wget \
     tzdata \
     php7-apache2 \
     php7-cli \

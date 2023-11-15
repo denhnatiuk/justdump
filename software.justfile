@@ -100,15 +100,6 @@ install-edge:
   sudo apt update
   sudo apt install microsoft-edge-stable
 
-
-# install-composer:
-#   if ! [ -x "$(command -v composer)" ]; then \
-#     echo 'Error: composer is not installed.' >&2 \
-#     exit 1 \
-#   else \
-# # sudo apt-get install git \
-#   fi
-
 install-php-tools:
   #!/usr/bin/env zsh
   tools=( \
@@ -130,7 +121,7 @@ install-php-tools:
   do
     composer require --dev "$i"
   done
-
+  
   composer global update
 
   echo 'export PATH=~/.composer/vendor/bin:$PATH' >> ~/.path_extenddings
