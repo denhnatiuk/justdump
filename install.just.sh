@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eu pipefail
+
+is_installed() {
+  # Use 'command -v' to check if the program is in the PATH
+  if command -v "$1" >/dev/null 2>&1; then
+    echo "$1 is already installed"
+    exit;
+  fi
+}
+
+# Check if the program is installed
+is_installed just
 
 if [ ! -z ${GITHUB_ACTIONS-} ]; then
   set -x

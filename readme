@@ -1,6 +1,9 @@
 https://cheatography.com/linux-china/cheat-sheets/justfile/
 
 
+npm install git+https://git@github.com/denyshnatiuk/justdump.git#<branch>
+npm install git+ssh://git@github.com/denyshnatiuk/justdump.git
+
 threadpassing:
 
 1. Installation stage
