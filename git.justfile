@@ -52,3 +52,18 @@ precommit:
 #   git ls-remote --heads ${REPO} ${BRANCH} | grep ${BRANCH} >/dev/null
 #   if [ "$?" == "1" ] ; then echo "Branch doesn't exist"; exit; fi
 
+hooks_init:
+  #!/bin/bash
+  dir="$PWD/.git/hooks"
+  find "$dir" -type f -name "*.sample" | while read file
+  do
+    echo "Processing $file"
+    filename=$(basename "$file")
+    base="${filename%.*}"
+    echo $base
+    if [ -f "$dir/$base.sh" ]; then
+      echo "File ${base}.sh exists"
+    else
+      cp $file $dir/$base.sh
+    fi
+  done

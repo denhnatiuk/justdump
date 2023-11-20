@@ -1,8 +1,8 @@
 #!/usr/bin/env just --justfile
 
 set shell := ["zsh", "-cu"] 
-set dotenv-load := true
-set positional-arguments := true
+set dotenv-load 
+set positional-arguments 
 
 # Timestamp using to generate unic names
 TIMESTAMP := `date +"%T"`
@@ -12,13 +12,13 @@ Project_Folder := trim_start_match( trim_start_match( absolute_path(justfile_dir
 
 Project_Name := `node -p "require('./package.json').name"`
 
-PRJ_NAME := `{{Project_NPM_Name}} || {{Project_Folder_Name}}`
+PRJ_NAME := env_var_or_default("Project_Name", "Project_Folder_Name")
 
 PRJ_VERSION := `node -p "require('./package.json').version"`
 
 Project_Type := env_var_or_default("", "WP")
 
-Curr_path := justfile_directory()/.justfile
+Curr_path := "justfile_directory()/.justfile"
 
 echo_Curr:
   echo {{Curr_path}}
@@ -28,6 +28,44 @@ echo_Curr:
 
 @_default: 
   just --list --unsorted
+
+test_talk:
+  #!/usr/bin/bash
+  echo "Please choose:"
+  select item in "fix" "feature" "release"
+  do
+  echo "You selected $item!"
+  break
+  done
+
+  echo "Please enter your name:"
+  read name
+  echo "Hello, $name!"
+
+# Update .env variable | Usage: update_env key value file(optional)
+update_env *args='': 
+  #!/usr/bin/bash
+  update_env() {
+    local key="$1"
+    local value="$2"
+    local file="${3:-.env}"
+    if grep -q "^$key=" "$file"; then
+      # If the key exists, replace its value
+      sed -i "s/^$key=.*/$key=$value/" "$file"
+      echo "Updated $key in $file"
+    else
+      # echo -e "\r\n$key=$value" >> "$file"
+      echo -e "\n$key=$value" >> "$file"
+      echo "Added $key to $file"
+    fi
+  }
+  update_env $1 $2 $3
+
+
+
+# Update key-value pair in .env file
+# update_env "$1" "$2" "$3"
+
 
 #init receipes as shell alias
 @init_receipes-as-shell-alias:
@@ -61,34 +99,34 @@ find_justfiles:
 
 #tar.bz2 project
 @tar-bz2-project:
-  rm -f ".temporary/{{Project_NPM_Name}}.tar.bz2"
-  tar -C {{justfile_directory()}} --exclude=".temporary" --exclude-vcs-ignores -cjvf .temporary/{{Project_NPM_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
+  rm -f ".temporary/{{Project_Name}}.tar.bz2"
+  tar -C {{justfile_directory()}} --exclude=".temporary" --exclude-vcs-ignores -cjvf .temporary/{{Project_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
 
 #untar.bz2 project
 @untar-bz2-project:
-  if [ ! -d {{Project_NPM_Name}} ]; then \
-    mkdir {{Project_NPM_Name}} \
+  if [ ! -d {{Project_Name}} ]; then \
+    mkdir {{Project_Name}} \
   else \
-    tar -C {{Project_NPM_Name}} -cjvf .temporary/{{Project_NPM_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
+    tar -C {{Project_Name}} -cjvf .temporary/{{Project_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
   fi \
-    && tar -xjvf {{Project_NPM_Name}}.tar.bz2 -C ~/projects/{{Project_NPM_Name}} \
-    && rm -f ~/projects/{{Project_NPM_Name}}.tar.bz2
+    && tar -xjvf {{Project_Name}}.tar.bz2 -C ~/projects/{{Project_Name}} \
+    && rm -f ~/projects/{{Project_Name}}.tar.bz2
 
 
 #backup picked files to NAS
 @backup2nas +FILES:
-  echo $NAS/$Project_Type/{{Project_NPM_Name}}/
-  sudo scp -rf -P $NAS_Port {{FILES}} $NAS/$Project_Type/{{Project_NPM_Name}}/{{FILES}}
+  echo $NAS/$Project_Type/{{Project_Name}}/
+  sudo scp -rf -P $NAS_Port {{FILES}} $NAS/$Project_Type/{{Project_Name}}/{{FILES}}
 
 #backup project to NAS
 @backup2nas-all:
-  rm -f ".temporary/{{Project_NPM_Name}}.tar.bz2"
-  tar -C {{justfile_directory()}} --exclude=".temporary" --exclude="{{Project_NPM_Name}}.tar.bz2" -cjvf .temporary/{{Project_NPM_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
-  sudo scp -P $NAS_Port .temporary/{{Project_NPM_Name}}.tar.bz2 $NAS_User@$NAS_Server:~/projects
+  rm -f ".temporary/{{Project_Name}}.tar.bz2"
+  tar -C {{justfile_directory()}} --exclude=".temporary" --exclude="{{Project_Name}}.tar.bz2" -cjvf .temporary/{{Project_Name}}.tar.bz2 $( ls -a {{justfile_directory()}} | grep -v '\(^\.$\)\|\(^\.\.$\)' )
+  sudo scp -P $NAS_Port .temporary/{{Project_Name}}.tar.bz2 $NAS_User@$NAS_Server:~/projects
   ssh -p $NAS_Port $NAS_User@$NAS_Server 'cd ~/projects \
-    && if [ ! -d "$DIRECTORY" ]; then mkdir {{Project_NPM_Name}} fi \
-    && tar -xjvf {{Project_NPM_Name}}.tar.bz2 -C ~/projects/{{Project_NPM_Name}} \
-    && rm -f ~/projects/{{Project_NPM_Name}}.tar.bz2'
+    && if [ ! -d "$DIRECTORY" ]; then mkdir {{Project_Name}} fi \
+    && tar -xjvf {{Project_Name}}.tar.bz2 -C ~/projects/{{Project_Name}} \
+    && rm -f ~/projects/{{Project_Name}}.tar.bz2'
 # gpg --encrypt -r denys.hnatiuk@gmail.com 
 # ssh -P $aliNAS_Port $aliNAS_User@$aliNAS_Server 'cat > ~/projects/$Project_Type.tar.gz.gpg'
 
@@ -96,6 +134,10 @@ find_justfiles:
 get_gitattributes:
   sudo wget -O "/etc/.gitattributes" -H "Cache-Control: no-cache" https://gist.githubusercontent.com/DenysHnatiuk/40b1f11db14baffd7c01b2b05fd35075/raw/1a24b050b053a087b52751b95923c84acc7131f5/gitattributes.txt | tee > .gitattributes
 
+
+set_node_version:
+  sudo sed -i '2i\\ \\ nvm use --lts' .envrc
+  direnv allow
 
 # npm audit fix
 npm-audit-fix:

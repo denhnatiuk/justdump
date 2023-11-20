@@ -100,6 +100,7 @@ install-edge:
   sudo apt update
   sudo apt install microsoft-edge-stable
 
+# install PHP tools
 install-php-tools:
   #!/usr/bin/env zsh
   tools=( \
@@ -128,3 +129,5 @@ install-php-tools:
 
   phpcs --config-set installed_paths %APPDATA%\Composer\vendor\wp-coding-standards\wpcs
   phpcs -i
+
+

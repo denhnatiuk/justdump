@@ -1,3 +1,20 @@
+update_env() {
+  local key="$1"
+  local value="$2"
+  local file="$3"
+
+  # Check if the key exists in the file
+  if grep -q "^$key=" "$file"; then
+    # If the key exists, replace its value
+    sed -i "s/^$key=.*/$key=$value/" "$file"
+    echo "Updated $key in $file"
+  else
+    # If the key does not exist, add a new key-value pair
+    echo "$key=$value" >> "$file"
+    echo "Added $key to $file"
+  fi
+}
+
 use_phpbrew() {
   local php_version=$1
 

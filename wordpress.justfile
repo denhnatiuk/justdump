@@ -1,7 +1,7 @@
 # Wordpress
 
 Author := `git config --get user.name`
-
+themeName := 
 
 
 @_default: 
