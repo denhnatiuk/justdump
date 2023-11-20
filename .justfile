@@ -4,30 +4,23 @@ set shell := ["zsh", "-cu"]
 set dotenv-load 
 set positional-arguments 
 
-# Timestamp using to generate unic names
 TIMESTAMP := `date +"%T"`
 DATE := `date +%Y-%m-%d`
 
-Project_Folder := trim_start_match( trim_start_match( absolute_path(justfile_directory()), parent_directory( justfile_directory() ) ), "/" )
-
 Project_Name := `node -p "require('./package.json').name"`
-
-PRJ_NAME := env_var_or_default("Project_Name", "Project_Folder_Name")
-
 PRJ_VERSION := `node -p "require('./package.json').version"`
+
+PRJ_ROOT := `git rev-parse --show-toplevel`
+
+PRJ_NAME := env_var_or_default("PRJ_NAME", "PRJ_ROOT")
+
 
 Project_Type := env_var_or_default("", "WP")
 
-Curr_path := "justfile_directory()/.justfile"
-
-echo_Curr:
-  echo {{Curr_path}}
-
-# ssh:
-#   ssh $NAS_User@$NAS_Server -p $NAS_Port 
-
+#defauts
 @_default: 
   just --list --unsorted
+
 
 test_talk:
   #!/usr/bin/bash
@@ -41,6 +34,29 @@ test_talk:
   echo "Please enter your name:"
   read name
   echo "Hello, $name!"
+
+
+# Create and sync dotenv with dotenv server
+# dotenv_init:
+#   npx dotenv-vault@latest new
+#   npx dotenv-vault@latest login
+
+# dotenv_sync:
+#   npx dotenv-vault@latest push
+#   npx dotenv-vault@latest pull
+
+
+# Set the GitHub repository, Read the .env file line by line, Split the line into name and value, Set the secret using the GitHub CLI
+dotenv_sync_gh_secrets:
+  #!/bin/bash
+  REPO="OWNER/REPO"
+
+  while IFS= read -r line
+  do
+      IFS='=' read -ra PARTS <<< "$line"
+      echo ${PARTS[1]} | gh secret set ${PARTS[0]} --repo=$REPO --body=-
+  done < .env
+
 
 # Update .env variable | Usage: update_env key value file(optional)
 update_env *args='': 
@@ -62,9 +78,19 @@ update_env *args='':
   update_env $1 $2 $3
 
 
+echo_ver:
+  echo {{PRJ_VERSION}}
 
-# Update key-value pair in .env file
-# update_env "$1" "$2" "$3"
+# Update version using node: npm version <update_type> : major.minor.patch
+increment_version +type:
+  npm version {{type}}
+
+# Update version using sh 
+@set_ver +new_ver:
+  echo version: {{PRJ_VERSION}}
+  jq '. |= . + { "version": "{{new_ver}}" }' package.json > package.json.tmp
+  mv package.json.tmp package.json
+  echo Replaces with version {{new_ver}}
 
 
 #init receipes as shell alias
